@@ -22,16 +22,16 @@ LCE Updater is a installer/Updater for the Minecraft Legacy Console Edition
 ```6. Let it do its thing (the process can take some time be patient!)```  
 ```7. After its done just launch the exe file```  
 
-## INFO:
+## Info:
 You can do --zip while running it from cmd to specify the Source Code repo zip if it doesn't want to download it for some reason.
 
 
-## TODO:
+## TO DO:
 
 - Make more command line commands
 - Im open to suggestions!
 
-## Contributions  
+## Contributions:  
   
 ### Contributions like Pull Requests and issues are highly appreciated!
 
