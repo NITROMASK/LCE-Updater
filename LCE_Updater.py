@@ -178,9 +178,9 @@ def find_solution(folder):
 def build_solution(msbuild, solution):
     clear_screen()
     
-    print(r"\Building...\n")
-    print(r"\This can take a while\n")
-    print(r"\Please be Patient!\n")
+    print(r"Building...")
+    print(r"This can take a while")
+    print(r"Please be Patient!")
     cmd = [
         msbuild,
         solution,
@@ -312,4 +312,5 @@ def main():
 
 
 if __name__ == "__main__":
+
     main()
