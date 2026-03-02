@@ -4,6 +4,7 @@ LCE Updater is a installer/Updater for the Minecraft Legacy Console Edition
 
 ### THIS IS WINDOWS ONLY FOR NOW!
 
+![Welp It Didn't load](.github/img.png)
 
 ## Requirements:
 - Visual Studio 2022
