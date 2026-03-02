@@ -17,9 +17,9 @@ LCE Updater is a installer/Updater for the Minecraft Legacy Console Edition
 ## Usage:
 ```1. Download the zip```  
 ```2. Unpack the zip into a folder preferably on the desktop and name the folder what you want```  
-```3. Drag and Drop The files from the zip to the folder that you created```
-```4. open cmd and cd into the folder with the script```
-```5. type into the terminal pip install -r requirements.txt```
+```3. Drag and Drop The files from the zip to the folder that you created```  
+```4. open cmd and cd into the folder with the script```  
+```5. type into the terminal pip install -r requirements.txt```  
 ```6. Open Launch.Bat```  
 ```7. Select The Branch```  
 ```8. Let it do its thing (the process can take some time be patient!)```  
