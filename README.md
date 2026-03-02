@@ -7,6 +7,7 @@ LCE Updater is a installer/Updater for the Minecraft Legacy Console Edition
 
 ## Requirements:
 - Visual Studio 2022
+- Visual Studio Workload (Desktop Development with C++)
 - Python (newest version or 3.13)
 - pip
 - Internet Connection
