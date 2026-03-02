@@ -1,5 +1,5 @@
 # LCE Updater
-Original LCE Source code that this program is using [![Github](https://img.shields.io/badge/github-repo-blue?logo=github)](https://github.com/smartcmd/MinecraftConsoles)  
+Original LCE Source code that this program is Compiling:  [![Github](https://img.shields.io/badge/github-repo-blue?logo=github)](https://github.com/smartcmd/MinecraftConsoles)  
 LCE Updater is a installer/Updater for the Minecraft Legacy Console Edition  
 
 ### THIS IS WINDOWS ONLY FOR NOW!
