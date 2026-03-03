@@ -48,7 +48,7 @@ Original LCE source code that this program compiles:
 
 ## Credits
 
-- **[Defendex](https://github.com/purnasth)** – Banner and `.exe` icon  
+- **[Defendex](https://github.com/sirdefendex)** – Banner and `.exe` icon  
 
 ---
 
