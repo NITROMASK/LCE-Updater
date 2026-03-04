@@ -3,7 +3,7 @@
 Original LCE source code that this program compiles:  
 [![GitHub](https://img.shields.io/badge/GitHub-MinecraftConsoles-blue?style=flat&logo=github&logoColor=white)](https://github.com/smartcmd/MinecraftConsoles)  
 
-**LCE Updater** is an installer/updater for the Minecraft Legacy Console Edition.  
+**LCE Updater** is an installer/updater/compiler for the Minecraft Legacy Console Edition.  
 
 > **Note:** This is **Windows only** for now.
 
@@ -22,7 +22,7 @@ Original LCE source code that this program compiles:
 
 ## Usage
 
-1. Download the zip from [Releases](https://github.com/LCE-Updater/releases).  
+1. Download the zip from [Releases](https://github.com/NITROMASK/LCE-Updater/releases/).  
 2. Unpack the zip into a folder (preferably on your Desktop) and name the folder whatever you like.  
 3. Drag and drop the file from the zip into the folder you just created.  
 4. Open `LCE Updater.exe`.  
