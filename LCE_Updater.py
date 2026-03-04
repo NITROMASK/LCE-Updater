@@ -16,14 +16,17 @@ from tqdm import tqdm
 OWNER = "smartcmd"
 REPO = "MinecraftConsoles"
 WORK_DIR = "tmp_update"
+UPDATE_FILE_ZIP = "Update"
 BUILD_CONFIG = "Release"
 #I Recommend not to change the platform because i didn't test it
 #Just Stay with windows compiling
 PLATFORM = "Windows64"
 LOCAL_VERSION_FILE = "local_version.txt"
 BUILD_LOG_FILE = "build.log"
+#Debug mode just gives more info for debugging errors
+LCE_UPDATER_DEBUG_MODE = False
 
-FOLDERS_TO_SYNC = [
+'''FOLDERS_TO_SYNC = [
     "Common",
     "Durango",
     "Music",
@@ -31,6 +34,9 @@ FOLDERS_TO_SYNC = [
     "Windows64",
     "Windows64_Media"
 ]
+not needed anymore.
+'''
+
 
 #Error message code
 
@@ -69,10 +75,15 @@ def find_msbuild():
 
 
 # Github Part
+#for some reason if it cant fetch it it crashes so ill just leave it alone
 
 def get_branches():
     url = f"https://api.github.com/repos/{OWNER}/{REPO}/branches"
     r = requests.get(url)
+    if LCE_UPDATER_DEBUG_MODE == True:
+        print("Status code:", r.status_code)
+        print("Response:", r.text)
+    
     if r.status_code != 200:
         safe_exit("Failed to fetch branches from GitHub API.")
     return r.json()
@@ -95,14 +106,15 @@ def select_branch_menu():
         print("Invalid selection.")
 
 
-# This one creates a version hash so when LCE is up to date it does nothing
+# This one creates a version hash so when LCE is up to date it asks if you wanna update.
+# IN TETSTING
+
 
 def is_latest(remote_sha):
     if not os.path.exists(LOCAL_VERSION_FILE):
         return False
     with open(LOCAL_VERSION_FILE, "r") as f:
         return f.read().strip() == remote_sha
-
 
 def save_version(sha):
     with open(LOCAL_VERSION_FILE, "w") as f:
@@ -131,7 +143,7 @@ def download(url: str, fname: str, chunk_size=1024):
 
 def download_branch(branch_name):
     url = f"https://github.com/{OWNER}/{REPO}/archive/refs/heads/{branch_name}.zip"
-    zip_path = os.path.join(WORK_DIR, "repo.zip")
+    zip_path = os.path.join(UPDATE_FILE_ZIP, "repo.zip")
     
     print(f"\nDownloading branch: {branch_name}\n")
     download(url, zip_path)
@@ -199,43 +211,31 @@ def build_solution(msbuild, solution):
     print("Build completed successfully.\n")
 
 
-'''this is folder sync its supposed to replace the folder in the release folder with the
-one's in Minecraft.Client to avoid errors while booting the game'''
+#edited sync so it only copies
+
 
 def sync_to_script_dir(source_root, branch_name):
-
-    cwd = os.getcwd()
-    client_path = os.path.join(source_root, "Minecraft.Client")
+    cwd = os.getcwd()  # where the script was run
     release_path = os.path.join(source_root, "x64", "Release")
 
-    # replace old folders
-    for folder in FOLDERS_TO_SYNC:
-        target = os.path.join(cwd, folder)
-        source = os.path.join(client_path, folder)
-        if os.path.exists(target):
-            shutil.rmtree(target)
-            print(f"Deleted old folder: {target}")
-        if os.path.exists(source):
-            shutil.copytree(source, target)
-            print(f"Copied new folder: {target}")
-        else:
-            print(f"Warning: {folder} not found in temp Minecraft.Client")
-
-    # copy Release build output
-    if os.path.exists(release_path):
-        for item in os.listdir(release_path):
-            s = os.path.join(release_path, item)
-            d = os.path.join(cwd, item)
-            if os.path.isdir(s):
-                if os.path.exists(d):
-                    shutil.rmtree(d)
-                shutil.copytree(s, d)
-                print(f"Copied built folder: {d}")
-            else:
-                shutil.copy2(s, d)
-                print(f"Copied built file: {d}")
-    else:
+    if not os.path.exists(release_path):
         print(f"Warning: Release folder not found at {release_path}")
+        return
+
+    for item in os.listdir(release_path):
+        src = os.path.join(release_path, item)
+        dest = os.path.join(cwd, item)
+
+        if os.path.isfile(src):
+            shutil.copy2(src, dest)
+            print(f"Copied file: {dest}")
+        elif os.path.isdir(src):
+            if os.path.exists(dest):
+                shutil.rmtree(dest)
+            shutil.copytree(src, dest)
+            print(f"Copied folder: {dest}")
+
+
 
 
     #Main
@@ -248,6 +248,10 @@ def main():
                                                  """)
     print("         Legacy Console Edition Updater")
     print("                 Made By Maskie")
+    print("v0.2")
+    
+    if LCE_UPDATER_DEBUG_MODE == True:
+        print("LCE UPDATER IS IN DEBUG MODE IT WILL SHOW MORE INFO...")
     
     parser = argparse.ArgumentParser()
     parser.add_argument("--zip", help="Use manually downloaded zip file")
@@ -257,6 +261,8 @@ def main():
     if os.path.exists(WORK_DIR):
         shutil.rmtree(WORK_DIR)
     os.makedirs(WORK_DIR, exist_ok=True)
+    
+    os.makedirs(UPDATE_FILE_ZIP, exist_ok=True)
 
     #Manual Mode if you have a zip
     if args.zip:
@@ -273,7 +279,6 @@ def main():
         msbuild = find_msbuild()
         build_solution(msbuild, solution)
 
-        sync_to_script_dir(source_folder, "manual")
 
         shutil.rmtree(WORK_DIR)
 
@@ -287,30 +292,69 @@ def main():
     remote_sha = branch["commit"]["sha"]
     
     clear_screen()
+    
     print(f"\nSelected branch: {branch_name}")
-    print(f"Latest commit: {remote_sha}")
 
-    if is_latest(remote_sha):
-        print("\nAlready up to date. No rebuild needed.")
-        return
+    # Read installed commit
+    if os.path.exists(LOCAL_VERSION_FILE):
+        with open(LOCAL_VERSION_FILE, "r") as f:
+            installed_commit = f.read().strip()
+    else:
+        installed_commit = None
 
-    print("\nUpdate detected. Starting process...\n")
+    print(f"Installed Commit: {installed_commit or 'None'}")
+    print(f"Latest Commit   : {remote_sha}")
 
-    msbuild = find_msbuild()
-    zip_path = download_branch(branch_name)
+    # Determine prompt text based on update status
+    if installed_commit == remote_sha:
+        print("\nAlready up to date.")
+        prompt_text = "Do you want to rebuild anyway? (y/n): "
+    else:
+        print("\nNew update available!")
+        prompt_text = "Do you want to update now? (y/n): "
+
+    # Ask the user
+    while True:
+        choice = input(prompt_text).strip().lower()
+        if choice in ("y", "yes"):
+            if installed_commit == remote_sha:
+                print("\nRebuilding current version from existing zip...\n")
+                zip_path = os.path.join(UPDATE_FILE_ZIP, "repo.zip")
+                if not os.path.exists(zip_path):
+                    safe_exit("Existing zip not found! Cannot rebuild.")
+            else:
+                print("\nUpdating to latest version...\n")
+                clear_screen()
+                zip_path = download_branch(branch_name)
+            break
+        elif choice in ("n", "no"):
+            print("\nOperation cancelled.")
+            return
+        else:
+            print("Please enter y or n.")
+
+    
+    # Then extract and build
+    clear_screen()
     source_folder = extract_zip(zip_path)
     solution = find_solution(source_folder)
+    msbuild = find_msbuild()
     build_solution(msbuild, solution)
-
     sync_to_script_dir(source_folder, branch_name)
 
     shutil.rmtree(WORK_DIR)
     save_version(remote_sha)
-
     clear_screen()
-    print("\nUpdate completed successfully.")
+    print("\nUpdate/Rebuild completed successfully.")
 
 
+# added this to stopit from autoclosing
 if __name__ == "__main__":
-
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(f"\nUnexpected error: {e}")
+    finally:
+        print("\nPress Enter to exit...")
+        input()
+        sys.exit()
