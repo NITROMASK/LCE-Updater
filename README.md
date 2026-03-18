@@ -1,5 +1,7 @@
 # LCE Updater
 
+# Tool is broken right now because the project got moved to cmake
+
 Original LCE source code that this program compiles:  
 [![GitHub](https://img.shields.io/badge/GitHub-MinecraftConsoles-blue?style=flat&logo=github&logoColor=white)](https://github.com/smartcmd/MinecraftConsoles)  
 
